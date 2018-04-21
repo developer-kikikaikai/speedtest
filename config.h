@@ -51,7 +51,7 @@
 #define PACKAGE "timetestlog"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "kikikaikaikai@gmail.com"
+#define PACKAGE_BUGREPORT ""
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "timetestlog"
@@ -70,6 +70,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
+
+/* Define to 1 if you want to ensure thread safe */
+#define THREAD_SAFE 1
 
 /* Version number of package */
 #define VERSION "1.0.0"
