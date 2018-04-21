@@ -2,8 +2,8 @@ TARGET=sample
 SRC=$(shell find . -maxdepth 1 -name *.c)
 CFLAG=-g -O0 
 #CFLAG+=-DTHREAD_SAFE
-LIBS=../lib/libtimelog.a -lpthread
-INC=-I ../include
+LIBS=../../lib/.libs/libtimelog.a -lpthread
+INC=-I ../../include
 OBJ=$(SRC:%.c=%.o)
 
 all: $(OBJ)

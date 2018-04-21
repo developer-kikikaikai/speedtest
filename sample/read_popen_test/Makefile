@@ -1,8 +1,8 @@
 TARGET=read_popen_time
 SRC=$(shell find . -maxdepth 1 -name *.c)
 CFLAG=-g -O0 
-LIBS=../lib/libtimelog.a
-INC=-I ../include
+LIBS=../../lib/.libs/libtimelog.a
+INC=-I ../../include
 OBJ=$(SRC:%.c=%.o)
 
 all: $(OBJ)
