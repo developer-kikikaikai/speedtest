@@ -8,6 +8,9 @@
 #include <string.h>
 #include <time.h>
 #include "timetestlog.h"
+#ifdef THREAD_SAFE
+#include <pthread.h>
+#endif
 
 /*************
  * define debug
@@ -108,6 +111,9 @@ struct timetestlog_mng_s{
 	unsigned long current_num; /*! numnber of current stored log */
 	unsigned long list_num; /*! max size of log_list */
 	struct timetestlog_data_s * log_list; /*! log list */
+#ifdef THREAD_SAFE
+	pthread_mutex_t lock; 
+#endif
 
 	/*! log interface methods */
 	TTLOG_INTERFACE_CLASS
@@ -117,10 +123,21 @@ struct timetestlog_mng_s{
 /* @{ */
 /*! Create, return allocate data */
 static struct timetestlog_mng_s * timetestlog_mng_create(char *delimiter, unsigned long maxloglen, unsigned long maxstoresize);
-/*! delete  mng, because timetestlog_mng_s is allocated into timetestlog_mng_create, it's better to free allocated data by API */
-static void timetestlog_mng_delete(struct timetestlog_mng_s * mng);
 /*! Get tmp buffer to remove extra allocate */
 static inline struct timetestlog_buffer_s * timetestlog_get_buffer(struct timetestlog_mng_s * mng);
+#ifdef THREAD_SAFE
+/*! lock handle */
+static inline void timetestlog_lock(void *handle);
+/*! unlock handle */
+static inline void timetestlog_unlock(void *handle);
+#define TTLOG_LOCK(handle) \
+	timetestlog_lock(handle);\
+	pthread_cleanup_push(timetestlog_unlock, handle);
+#define TTLOG_UNLOCK pthread_cleanup_pop(1);
+#else
+#define TTLOG_LOCK(handle)
+#define TTLOG_UNLOCK 
+#endif
 /* @} */
 
 /*! @name log class interface implement API for timetestlog_mng_s */
@@ -195,7 +212,7 @@ static struct timetestlog_mng_s * timetestlog_mng_create(char *delimiter, size_t
 	mng=(struct timetestlog_mng_s *)calloc(1, sizeof(struct timetestlog_mng_s));
 	if(!mng) {
 		DEBUG_ERRPRINT("calloc mng error:%s\n", strerror(errno));
-		goto err;
+		return NULL;
 	}
 
 	//set interface class
@@ -237,10 +254,15 @@ static struct timetestlog_mng_s * timetestlog_mng_create(char *delimiter, size_t
 		}
 	}
 
+#ifdef THREAD_SAFE
+	//add mutex
+	pthread_mutex_init(&mng->lock, NULL);
+#endif
 	return mng;
 
 err:
-	timetestlog_mng_delete(mng);
+	mng->free(mng);
+	free(mng);
 	return NULL;
 }
 
@@ -263,6 +285,17 @@ static inline int timetestlog_mng_store(struct timetestlog_buffer_s *buffer, voi
 static inline struct timetestlog_buffer_s * timetestlog_get_buffer(struct timetestlog_mng_s * mng) {
 	return &mng->tmpbuf;
 }
+
+#ifdef THREAD_SAFE
+static inline void timetestlog_lock(void *handle) {
+	struct timetestlog_mng_s * mng=(struct timetestlog_mng_s *)handle;
+	pthread_mutex_lock(&mng->lock);
+}
+static inline void timetestlog_unlock(void *handle) {
+	struct timetestlog_mng_s * mng=(struct timetestlog_mng_s *)handle;
+	pthread_mutex_unlock(&mng->lock);
+}
+#endif
 
 /*interface*/
 static void timetestlog_mng_show(void *handle) {
@@ -296,18 +329,6 @@ static void timetestlog_mng_free(void *handle) {
 	timetestlog_buffer_free(&mng->tmpbuf);
 }
 
-static void timetestlog_mng_delete(struct timetestlog_mng_s * mng) {
-	if(!mng) {
-		return;
-	}
-
-	//free member by using IF
-	mng->free(mng);
-
-	//free ownself
-	free(mng);
-}
-
 /*************
  * public interface API implement
 *************/
@@ -317,6 +338,7 @@ void * timetestlog_init(char *delimiter, size_t maxloglen, unsigned long maxstor
 }
 
 int timetestlog_store_printf(void * handle, const char *format, ...) {
+	int ret=0;
 	//fail safe
 	if(!handle || !format) {
 		return TTLOG_FAILED;
@@ -327,13 +349,18 @@ int timetestlog_store_printf(void * handle, const char *format, ...) {
 		return TTLOG_FAILED;
 	}
 
+TTLOG_LOCK(handle)
+
 	struct timetestlog_buffer_s * buffer=timetestlog_get_buffer(mng);
 	va_list arg;
 	va_start(arg, format);
 	vsnprintf(buffer->buf, buffer->size, format, arg);
 	va_end(arg);
+	ret = mng->store(buffer, mng);
 
-	return mng->store(buffer, mng);
+TTLOG_UNLOCK
+
+	return ret;
 }
 
 void timetestlog_exit(void * handle) {
@@ -343,10 +370,19 @@ void timetestlog_exit(void * handle) {
 	}
 
 	struct timetestlog_mng_s * mng= (struct timetestlog_mng_s *)handle;
+
+TTLOG_LOCK(handle)
 	//show log
 	mng->show(mng);
 
 	//free mng
-	timetestlog_mng_delete(mng);
+	mng->free(mng);
+TTLOG_UNLOCK
+//destroy
+
+#ifdef THREAD_SAFE
+	pthread_mutex_destroy(&mng->lock);
+#endif
+	free(mng);
 }
 
