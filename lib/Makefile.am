@@ -7,4 +7,4 @@ noinst_LTLIBRARIES = libtimelog.la
 
 libtimelog_la_SOURCES = timetestlog.c
 #for statik library
-#libtimetestlog_la_LDFLAGS=-module -shared -export-dynamic -static -shared -rpath $(libdir)
+#libtimelog_la_LDFLAGS=-module -shared -export-dynamic -static -shared -rpath $(libdir)
