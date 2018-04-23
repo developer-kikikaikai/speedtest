@@ -122,7 +122,7 @@ struct timetestlog_mng_s{
 /*! @name Public API definition for timetestlog_mng_s */
 /* @{ */
 /*! Create, return allocate data */
-static struct timetestlog_mng_s * timetestlog_mng_create(char *delimiter, unsigned long maxloglen, unsigned long maxstoresize);
+static struct timetestlog_mng_s * timetestlog_mng_create(char *delimiter, size_t maxloglen, unsigned long maxstoresize);
 /*! Get tmp buffer to remove extra allocate */
 static inline struct timetestlog_buffer_s * timetestlog_get_buffer(struct timetestlog_mng_s * mng);
 #ifdef THREAD_SAFE
