@@ -42,10 +42,14 @@ NUM_LIST.each{|num|
 }
 
 result_total_hash.each{|num, result_hash|
-	puts("#####Call #{PNAME} #{CALL_NUM} times, input is #{num}##########")
+	puts("**Call #{PNAME} #{CALL_NUM} times, input is #{num}**")
+	puts("")
+	puts("|Action|Total time|")
+	puts("|:---|:---|")
 	result_hash.each{|key, result|
-		puts("[#{key}] Total:#{result[:total]}")
+		puts("|#{key[5..key.length()]}|#{result[:total]}|")
 	}
+	puts("")
 #	puts("detail:")
 #	puts JSON.pretty_generate(result_hash)
 }

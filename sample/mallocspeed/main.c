@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	if(!handle) return 0;
 
 	void **mem_list=calloc(2*fsize, MAXSIZE*2);
-	timetestlog_store_printf(handle, "CALL:normal calloc(all size is under callo size)\n");
+	timetestlog_store_printf(handle, "CALL:normal calloc(calloc/free under initial size)\n");
 	for(int i=0;i<fsize;i++) {
 		mem_list[i] = calloc(1, MAXSIZE);
 	}
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	}
 	timetestlog_store_printf(handle, "end\n");
 
-	timetestlog_store_printf(handle, "CALL:wrap calloc(all size is under callo size)\n");
+	timetestlog_store_printf(handle, "CALL:wrap calloc code(calloc/free under initial size)\n");
 	for(int i=0;i<fsize;i++) {
 		mem_list[i] = dp_calloc(1, MAXSIZE);
 	}
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 	}
 	timetestlog_store_printf(handle, "end\n");
 
-	timetestlog_store_printf(handle, "CALL:hhs_calloc(all size is under callo size)\n");
+	timetestlog_store_printf(handle, "CALL:hhs_calloc(calloc/free under initial size)\n");
 	for(int i=0;i<fsize;i++) {
 		mem_list[i] = hhs_calloc(1, MAXSIZE);
 	}
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	timetestlog_store_printf(handle, "end\n");
 
 #ifdef USE_TCMALLOC
-	timetestlog_store_printf(handle, "CALL:tc_calloc(all size is under callo size)\n");
+	timetestlog_store_printf(handle, "CALL:tc_calloc(calloc/free under initial size)\n");
 	for(int i=0;i<fsize;i++) {
 		mem_list[i] = tc_calloc(1, MAXSIZE);
 	}
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	timetestlog_store_printf(handle, "end\n");
 #endif
 
-	timetestlog_store_printf(handle, "CALL:normal calloc(has over size)\n");
+	timetestlog_store_printf(handle, "CALL:normal calloc(calloc/free initial size+over size)\n");
 	for(int i=0;i<2*fsize;i++) {
 		mem_list[2*i] = calloc(1, MAXSIZE);
 		mem_list[2*i + 1] = calloc(1, MAXSIZE*2);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 	}
 	timetestlog_store_printf(handle, "end\n");
 
-	timetestlog_store_printf(handle, "CALL:wrap calloc(has over size)\n");
+	timetestlog_store_printf(handle, "CALL:wrap calloc(calloc/free initial size+over size)\n");
 	for(int i=0;i<2*fsize;i++) {
 		mem_list[2*i] = dp_calloc(1, MAXSIZE);
 		mem_list[2*i + 1] = dp_calloc(1, MAXSIZE*2);
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 	}
 	timetestlog_store_printf(handle, "end\n");
 
-	timetestlog_store_printf(handle, "CALL:hhs_calloc(has over size)\n");
+	timetestlog_store_printf(handle, "CALL:hhs_calloc(calloc/free initial size+over size)\n");
 	for(int i=0;i<2*fsize;i++) {
 		mem_list[2*i] = hhs_calloc(1, MAXSIZE);
 		mem_list[2*i + 1] = hhs_calloc(1, MAXSIZE*2);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 	timetestlog_store_printf(handle, "end\n");
 
 #ifdef USE_TCMALLOC
-	timetestlog_store_printf(handle, "CALL:tc_calloc(has over size)\n");
+	timetestlog_store_printf(handle, "CALL:tc_calloc(calloc/free initial size+over size)\n");
 	for(int i=0;i<2*fsize;i++) {
 		mem_list[2*i] = tc_calloc(1, MAXSIZE);
 		mem_list[2*i + 1] = tc_calloc(1, MAXSIZE*2);
