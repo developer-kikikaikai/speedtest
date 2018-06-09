@@ -33,7 +33,7 @@ static inline void pthread_mutex_unlock_(void *arg) {
         pthread_cleanup_push(pthread_mutex_unlock_, &malloc_list_g.mutex);
 #define OWN_UNLOCK pthread_cleanup_pop(1);
 
-static void dputil_list_push(malloc_list_t * this, malloc_data_t * data) {
+static inline void dputil_list_push(malloc_list_t * this, malloc_data_t * data) {
         /* add to tail */
         data->prev = this->tail;
         //slide tail
@@ -48,7 +48,7 @@ static void dputil_list_push(malloc_list_t * this, malloc_data_t * data) {
         }
 }
 
-static void dputil_list_pull(malloc_list_t * this, malloc_data_t * data) {
+static inline void dputil_list_pull(malloc_list_t * this, malloc_data_t * data) {
         if(!data) {
                 return;
         }
@@ -69,13 +69,13 @@ static void dputil_list_pull(malloc_list_t * this, malloc_data_t * data) {
         }
 }
 
-static malloc_data_t * dputil_list_pop(malloc_list_t * this) {
+static inline malloc_data_t * dputil_list_pop(malloc_list_t * this) {
         malloc_data_t * data = this->head;
 	dputil_list_pull(this, data);
 	return data;
 }
 
-static void dputil_list_head(malloc_list_t * this, malloc_data_t * data) {
+static inline void dputil_list_head(malloc_list_t * this, malloc_data_t * data) {
 
 	//there is a prev.
 	data->next = this->head;
@@ -129,6 +129,7 @@ static inline int dp_unuse_memory(void *ptr) {
 			memory->used=0;
 			memory->prev=NULL;
 			memory->next=NULL;
+			memset(ptr, 0, malloc_list_g.size);
 			dputil_list_head(&malloc_list_g,  memory);
 			return 0;
 		}

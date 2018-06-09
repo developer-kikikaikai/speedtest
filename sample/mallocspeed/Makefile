@@ -3,7 +3,7 @@ SRC=$(shell find . -maxdepth 1 -name "*.c")
 #CFLAG=-g -O0 
 CFLAG=-O2
 LIBS=../../lib/.libs/libtimelog.a own/libown_malloc.a hhs/libhhs_malloc.a -lpthread 
-CFLAG+=-DUSE_TCMALLOC -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free
+CFLAG+=-DUSE_TCMALLOC 
 LIBS+=-Xlinker -rpath -Xlinker /usr/local/lib/  -ltcmalloc
 INC=-I ../../include -I /usr/local/include/ -Iown -Ihhs
 OBJ=$(SRC:%.c=%.o)

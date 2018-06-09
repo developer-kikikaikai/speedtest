@@ -22,7 +22,7 @@ static void create_magic_table(void) {
 	}
 }
 
-static int get_non_zero_index(uint64_t data) {
+static inline int get_non_zero_index(uint64_t data) {
 	uint64_t rightbit = ( uint64_t ) ( data & ((-1)*data) );
 	uint64_t index = (rightbit * MAGIC_HASH ) >> 58;
 	return magic_table[index];
@@ -139,13 +139,12 @@ static inline void hhs_unset_memory(malloc_data_t * memory, int is_used) {
 }
 
 static inline uint64_t hhs_get_buffer_place(uint8_t * buffer_list, void * ptr) {
-	uint64_t place = (uint64_t)ptr - (uint64_t)buffer_list;
 	//this place is XXX00000 bit place, slide by using malloc_list_g.slide_bit
-	place = place >> malloc_list_g.slide_bit;
-	return place;
+	return  ((uint64_t)ptr - (uint64_t)buffer_list) >> malloc_list_g.slide_bit;
 }
 
 static inline int hhs_is_not_ptr_in_buf(void * ptr) {
+	
 	return (uint64_t)ptr < (uint64_t)malloc_list_g.user_buf || (uint64_t)(malloc_list_g.user_buf) + malloc_list_g.max_cnt * malloc_list_g.max_size < (uint64_t)ptr;
 }
 /* @} */
@@ -177,6 +176,7 @@ HHS_LOCK
 
 	//get slide bit to use hash
 	malloc_list_g.slide_bit = get_non_zero_index(max_size);
+
 	ret = 0;
 err:
 HHS_UNLOCK
