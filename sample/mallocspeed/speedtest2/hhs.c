@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 
 	void *handle = timetestlog_init(",", 100, 100);
 	if(!handle) return 0;
-	hhs_malloc_init(MAXSIZE, MAXNUM);
+	HHSMalloc this = hhs_malloc_init(MAXSIZE, MAXNUM, 0);
 
 	struct connection_t * client = calloc(SAME_TIMING_CLIENT, MAXSIZE);
 	timetestlog_store_printf(handle, "CALL:hhs_calloc(calloc/free under initial size)\n");
@@ -31,20 +31,21 @@ int main(int argc, char *argv[]) {
 		for(int i=0;i<SAME_TIMING_CLIENT;i++) {
 			//connect client
 			for(int j=0;j<CON_REQUEST;j++) {
-				client[i].con_buf[j] = hhs_calloc(1, MAXSIZE);
+				client[i].con_buf[j] = hhs_calloc(this, 1, MAXSIZE);
 			}
 		}
 
 		for(int i=0;i<SAME_TIMING_CLIENT;i++) {
 			//connect client
 			for(int j=0;j<CON_REQUEST;j++) {
-				hhs_free(client[close_con_table[i]].con_buf[j]);
+				hhs_free(this, client[close_con_table[i]].con_buf[j]);
 			}
 		}
 		cnt+=SAME_TIMING_CLIENT;
 	}
 	timetestlog_store_printf(handle, "end\n");
 	free(client);
+	hhs_malloc_exit(this);
 	//exit
 	timetestlog_exit(handle);
 	return 0;
