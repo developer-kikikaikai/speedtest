@@ -196,7 +196,7 @@ static inline int timetestlog_data_store(struct timetestlog_buffer_s *buffer, vo
 
 static void timetestlog_data_show(void *handle) {
 	struct timetestlog_data_s * data = (struct timetestlog_data_s *)handle;
-	printf("%u.%09lu%s%s", (unsigned int)data->time.tv_sec, data->time.tv_nsec, data->delimiter_p, data->buf.buf);
+	fprintf(stderr, "%u.%09lu%s%s", (unsigned int)data->time.tv_sec, data->time.tv_nsec, data->delimiter_p, data->buf.buf);
 }
 
 static void timetestlog_data_free(void *handle) {
